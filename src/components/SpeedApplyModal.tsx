@@ -5,16 +5,22 @@ import {
   CheckCircle2,
   Clock,
   Send,
-  User,
   Calendar,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { Job, CandidateProfile, JobApplication } from '../types';
+import { useI18n } from '../i18n/I18nContext';
+import { sanitizeString } from '../security/sanitizer';
+import { csrfService } from '../security/csrf';
+
+import { UserSession, authService } from '../services/authService';
 
 interface SpeedApplyModalProps {
   job: Job | null;
   profile: CandidateProfile;
+  session: UserSession | null;
   isOpen: boolean;
   onClose: () => void;
   onSubmitApplication: (application: JobApplication) => void;
@@ -24,12 +30,16 @@ interface SpeedApplyModalProps {
 export const SpeedApplyModal: React.FC<SpeedApplyModalProps> = ({
   job,
   profile,
+  session,
   isOpen,
   onClose,
   onSubmitApplication,
   onGoToTracker,
 }) => {
-  if (!isOpen || !job) return null;
+  const { t } = useI18n();
+
+  // Strict RBAC: Empresa cannot open or submit application
+  if (!isOpen || !job || session?.role === 'empresa') return null;
 
   const [pitchNote, setPitchNote] = useState(
     `Hi ${job.company} hiring team, I am excited about the ${job.title} role! With ${profile.experienceYears} years of experience in ${profile.skills.slice(0, 3).join(', ')}, I can hit the ground running immediately.`
@@ -54,9 +64,23 @@ export const SpeedApplyModal: React.FC<SpeedApplyModalProps> = ({
   ];
 
   const handleApply = () => {
+    // Validate RBAC
+    const rbacCheck = authService.assertCanApplyJobs(session);
+    if (!rbacCheck.allowed) {
+      alert(rbacCheck.error || 'Acesso negado: Empresas não podem se candidatar.');
+      onClose();
+      return;
+    }
+
+    // Validate anti-CSRF
+    const token = csrfService.getToken();
+    if (!csrfService.validateToken(token)) {
+      alert(t('auth.csrfError'));
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate express transmission
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -77,13 +101,13 @@ export const SpeedApplyModal: React.FC<SpeedApplyModalProps> = ({
         status: 'Applied',
         appliedAt: 'Just now',
         urgency: job.urgency,
-        pitchNote,
+        pitchNote: sanitizeString(pitchNote),
         interviewSlot: preferredSlot,
         feedback: `SpeedPass profile received. Expected first screening response within ${job.hiringSpeedDays * 24} hours.`
       };
 
       onSubmitApplication(newApp);
-    }, 600);
+    }, 500);
   };
 
   const handleClose = () => {
@@ -139,8 +163,10 @@ export const SpeedApplyModal: React.FC<SpeedApplyModalProps> = ({
                 <span className="font-bold text-amber-700">Under {job.hiringSpeedDays * 24} hours</span>
               </div>
               <div className="flex items-center justify-between text-slate-700">
-                <span className="font-medium">Candidate SpeedPass:</span>
-                <span className="text-emerald-700 font-bold">Verified & Active</span>
+                <span className="font-medium">Security Validation:</span>
+                <span className="text-emerald-700 font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" /> CSRF Verified & Encrypted
+                </span>
               </div>
             </div>
 

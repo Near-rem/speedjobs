@@ -16,9 +16,12 @@ import {
   Code2,
   Link2,
   Globe,
-  Share2
+  ShieldCheck
 } from 'lucide-react';
 import { CandidateProfile } from '../types';
+import { useI18n } from '../i18n/I18nContext';
+import { sanitizeString, isValidEmail, isSafeUrl } from '../security/sanitizer';
+import { csrfService } from '../security/csrf';
 
 interface CandidateSpeedPassProps {
   profile: CandidateProfile;
@@ -31,9 +34,11 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
   onSaveProfile,
   onBrowseJobs,
 }) => {
+  const { t } = useI18n();
   const [formData, setFormData] = useState<CandidateProfile>({ ...profile });
   const [newSkill, setNewSkill] = useState('');
   const [isSaved, setIsSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const popularSkills = [
     'React',
@@ -51,7 +56,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
   ];
 
   const handleAddSkill = (skillToAdd: string) => {
-    const trimmed = skillToAdd.trim();
+    const trimmed = sanitizeString(skillToAdd);
     if (!trimmed) return;
     if (formData.skills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) return;
 
@@ -71,7 +76,39 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSaveProfile(formData);
+    setErrorMsg(null);
+
+    // Validate anti-CSRF
+    const csrfToken = csrfService.getToken();
+    if (!csrfService.validateToken(csrfToken)) {
+      setErrorMsg(t('auth.csrfError'));
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setErrorMsg('E-mail inválido');
+      return;
+    }
+
+    // Sanitize all inputs
+    const sanitizedProfile: CandidateProfile = {
+      fullName: sanitizeString(formData.fullName),
+      title: sanitizeString(formData.title),
+      email: sanitizeString(formData.email).toLowerCase(),
+      phone: sanitizeString(formData.phone),
+      location: sanitizeString(formData.location),
+      skills: formData.skills.map((s) => sanitizeString(s)).filter(Boolean),
+      experienceYears: Math.max(0, Math.min(40, Number(formData.experienceYears) || 0)),
+      expectedSalary: Math.max(0, Number(formData.expectedSalary) || 0),
+      availability: formData.availability,
+      bio: sanitizeString(formData.bio),
+      github: isSafeUrl(formData.github) ? formData.github : '',
+      linkedin: isSafeUrl(formData.linkedin) ? formData.linkedin : '',
+      portfolio: isSafeUrl(formData.portfolio) ? formData.portfolio : '',
+      avatarUrl: formData.avatarUrl,
+    };
+
+    onSaveProfile(sanitizedProfile);
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2500);
   };
@@ -86,11 +123,11 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
               <UserCheck className="w-5 h-5" />
             </span>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Candidate SpeedPass™
+              {t('speedPass.title')}
             </h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Your pre-verified express talent profile. Used for instant 1-Click job applications.
+            {t('speedPass.subtitle')}
           </p>
         </div>
 
@@ -99,14 +136,13 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
           className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
         >
           <Zap className="w-4 h-4 text-amber-400 fill-current" />
-          <span>Test Match Against Jobs</span>
+          <span>Ver Vagas Compatíveis</span>
         </button>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* SpeedPass ID Card Mockup */}
         <div className="p-6 rounded-2xl bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 text-white border border-slate-800 shadow-xl relative overflow-hidden">
-          {/* Subtle background glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
@@ -120,7 +156,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-black tracking-tight">{formData.fullName}</h2>
                   <span className="text-[10px] font-bold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Zap className="w-3 h-3 fill-current" /> SPEEDPASS VERIFIED
+                    <Zap className="w-3 h-3 fill-current" /> {t('speedPass.verifiedBadge')}
                   </span>
                 </div>
                 <p className="text-sm text-slate-300 font-medium">{formData.title}</p>
@@ -131,7 +167,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div className="sm:text-right">
-              <span className="text-xs text-slate-400 block">Availability</span>
+              <span className="text-xs text-slate-400 block">{t('speedPass.availability')}</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-sm text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full mt-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 {formData.availability}
@@ -143,7 +179,9 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
           </div>
 
           <div className="mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center gap-2 relative z-10">
-            <span className="text-xs text-slate-400 font-semibold mr-1">Top Verified Skills:</span>
+            <span className="text-xs text-slate-400 font-semibold mr-1">
+              {t('speedPass.verifiedSkills')}
+            </span>
             {formData.skills.map((skill) => (
               <span
                 key={skill}
@@ -160,18 +198,30 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-blue-600" />
-              <span>Edit SpeedPass Details</span>
+              <span>{t('speedPass.editTitle')}</span>
             </h3>
-            {isSaved && (
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full animate-in fade-in">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Saved to SpeedPass!
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" /> OWASP Sanitized
               </span>
-            )}
+              {isSaved && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full animate-in fade-in">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> {t('speedPass.savedAlert')}
+                </span>
+              )}
+            </div>
           </div>
+
+          {errorMsg && (
+            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              {errorMsg}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Full Name</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.fullName')}</label>
               <input
                 type="text"
                 value={formData.fullName}
@@ -182,7 +232,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Professional Headline</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.headline')}</label>
               <input
                 type="text"
                 value={formData.title}
@@ -193,7 +243,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Email Address</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.email')}</label>
               <input
                 type="email"
                 value={formData.email}
@@ -204,7 +254,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Phone Number</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.phone')}</label>
               <input
                 type="text"
                 value={formData.phone}
@@ -214,7 +264,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Current Location</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.location')}</label>
               <input
                 type="text"
                 value={formData.location}
@@ -224,7 +274,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Years of Experience</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.experience')}</label>
               <input
                 type="number"
                 min={0}
@@ -238,7 +288,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Target Annual Salary ($ USD)</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.salary')}</label>
               <input
                 type="number"
                 step={5000}
@@ -251,7 +301,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Availability Window</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.availabilityWindow')}</label>
               <select
                 value={formData.availability}
                 onChange={(e) =>
@@ -262,16 +312,16 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
                 }
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800"
               >
-                <option value="Immediately">⚡ Immediately (Fastest match)</option>
-                <option value="In 1-2 weeks">In 1-2 weeks (Standard notice)</option>
-                <option value="In 1 month">In 1 month</option>
+                <option value="Immediately">{t('speedPass.availImmediate')}</option>
+                <option value="In 1-2 weeks">{t('speedPass.availTwoWeeks')}</option>
+                <option value="In 1 month">{t('speedPass.availMonth')}</option>
               </select>
             </div>
           </div>
 
           {/* Bio */}
           <div className="text-xs">
-            <label className="block font-semibold text-slate-700 mb-1">Quick Bio / Summary</label>
+            <label className="block font-semibold text-slate-700 mb-1">{t('speedPass.bio')}</label>
             <textarea
               rows={3}
               value={formData.bio}
@@ -284,14 +334,13 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
           <div className="space-y-3 pt-2 border-t border-slate-100">
             <div className="flex items-center justify-between">
               <label className="font-semibold text-xs text-slate-900">
-                Skills & Tech Stack ({formData.skills.length})
+                {t('speedPass.skillsSection')} ({formData.skills.length})
               </label>
               <span className="text-[11px] text-slate-400">
-                Directly impacts your Match Score across jobs
+                {t('speedPass.skillsHint')}
               </span>
             </div>
 
-            {/* Current skill tags */}
             <div className="flex flex-wrap gap-2">
               {formData.skills.map((skill) => (
                 <span
@@ -310,7 +359,6 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
               ))}
             </div>
 
-            {/* Add skill input */}
             <div className="flex gap-2">
               <input
                 type="text"
@@ -322,7 +370,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
                     handleAddSkill(newSkill);
                   }
                 }}
-                placeholder="Type a skill and press Enter (e.g. Docker, GraphQL, Go)..."
+                placeholder={t('speedPass.addSkillPlaceholder')}
                 className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
@@ -331,14 +379,13 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
                 className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add</span>
+                <span>{t('speedPass.addSkillBtn')}</span>
               </button>
             </div>
 
-            {/* Popular quick add recommendations */}
             <div className="pt-1">
               <span className="text-[11px] text-slate-400 block mb-1">
-                High-demand suggestions:
+                {t('speedPass.popularSuggestions')}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {popularSkills
@@ -401,7 +448,7 @@ export const CandidateSpeedPass: React.FC<CandidateSpeedPassProps> = ({
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>Update Candidate SpeedPass</span>
+              <span>{t('speedPass.updateBtn')}</span>
             </button>
           </div>
         </div>

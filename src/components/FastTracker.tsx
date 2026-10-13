@@ -6,15 +6,12 @@ import {
   Clock,
   Calendar,
   AlertCircle,
-  ExternalLink,
   Trash2,
   Video,
-  Award,
-  ArrowRight,
-  TrendingUp,
-  Building2
+  Award
 } from 'lucide-react';
 import { JobApplication, ApplicationStatus } from '../types';
+import { useI18n } from '../i18n/I18nContext';
 
 interface FastTrackerProps {
   applications: JobApplication[];
@@ -31,6 +28,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
   onOpenSimulator,
   onBrowseJobs,
 }) => {
+  const { t } = useI18n();
   const [filterStatus, setFilterStatus] = useState<string>('All');
 
   const filteredApps = applications.filter((app) => {
@@ -86,11 +84,11 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
               <Layers className="w-5 h-5" />
             </span>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Fast Tracker Pipeline
+              {t('tracker.title')}
             </h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Real-time status of your high-speed applications and interview invitations.
+            {t('tracker.subtitle')}
           </p>
         </div>
 
@@ -99,7 +97,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer self-start md:self-auto"
         >
           <Zap className="w-4 h-4 fill-white" />
-          <span>Apply to More Flash Jobs</span>
+          <span>{t('tracker.applyMore')}</span>
         </button>
       </div>
 
@@ -107,7 +105,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 text-xs">
-            <span>Active Roles</span>
+            <span>{t('tracker.activeRoles')}</span>
             <Layers className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2">{activeCount}</div>
@@ -116,7 +114,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 text-xs">
-            <span>Speed Interviews</span>
+            <span>{t('tracker.speedInterviews')}</span>
             <Video className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-black text-amber-600 mt-2">{interviewCount}</div>
@@ -125,16 +123,16 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 text-xs">
-            <span>Avg Response</span>
+            <span>{t('tracker.avgResponse')}</span>
             <Clock className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2">14.2 hrs</div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-0.5">⚡ 4x faster than industry</div>
+          <div className="text-[11px] text-emerald-600 font-medium mt-0.5">⚡ 4x faster</div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 text-xs">
-            <span>Offers Extended</span>
+            <span>{t('tracker.offersExtended')}</span>
             <Award className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-2xl font-black text-indigo-700 mt-2">{offerCount}</div>
@@ -166,15 +164,15 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
             <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center">
               <Zap className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-800 text-base">No applications in this category</h3>
+            <h3 className="font-bold text-slate-800 text-base">{t('tracker.emptyTitle')}</h3>
             <p className="text-sm text-slate-500 max-w-sm mx-auto">
-              Find lightning-fast roles in the job board and submit with your 1-Click SpeedPass!
+              {t('tracker.emptySubtitle')}
             </p>
             <button
               onClick={onBrowseJobs}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 cursor-pointer"
             >
-              Browse Open Positions
+              {t('nav.browseJobs')}
             </button>
           </div>
         ) : (
@@ -217,7 +215,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
                     <button
                       onClick={() => onRemoveApplication(app.id)}
                       className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                      title="Withdraw application"
+                      title={t('tracker.withdrawTitle')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -263,17 +261,17 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
                   </div>
                 </div>
 
-                {/* Feedback or Next Steps */}
+                {/* Recruiter Feedback */}
                 {app.feedback && (
                   <div className="text-xs bg-blue-50/70 border border-blue-100 p-3 rounded-lg text-slate-700 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-blue-900">Recruiter Status:</strong> {app.feedback}
+                      <strong className="text-blue-900">{t('tracker.recruiterStatus')}</strong> {app.feedback}
                     </div>
                   </div>
                 )}
 
-                {/* Specific Action Buttons per status */}
+                {/* Action Buttons */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs">
                   <div className="text-slate-500 flex items-center gap-1.5">
                     {app.interviewSlot ? (
@@ -282,7 +280,7 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
                         <span>Slot: <strong className="text-slate-700">{app.interviewSlot}</strong></span>
                       </>
                     ) : (
-                      <span>SLA: Decision in &lt;24 hours</span>
+                      <span>SLA: &lt;24 hours</span>
                     )}
                   </div>
 
@@ -293,22 +291,21 @@ export const FastTracker: React.FC<FastTrackerProps> = ({
                         className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 px-3.5 py-1.5 rounded-lg font-black transition-colors cursor-pointer"
                       >
                         <Video className="w-3.5 h-3.5 fill-current" />
-                        <span>Practice in 15-Min Simulator</span>
+                        <span>{t('tracker.practiceInSimulator')}</span>
                       </button>
                     )}
 
-                    {/* Quick advance simulation for user testing */}
                     <select
                       value={app.status}
                       onChange={(e) => onUpdateStatus(app.id, e.target.value as ApplicationStatus)}
                       className="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 text-slate-700 text-xs font-semibold cursor-pointer"
                     >
-                      <option value="Applied">Set Status: Applied</option>
-                      <option value="Fast Screened">Set Status: Fast Screened</option>
-                      <option value="Speed Interview">Set Status: Speed Interview</option>
-                      <option value="Offer Extended">Set Status: Offer Extended</option>
-                      <option value="Hired">Set Status: Hired</option>
-                      <option value="Declined">Set Status: Declined</option>
+                      <option value="Applied">Status: Applied</option>
+                      <option value="Fast Screened">Status: Fast Screened</option>
+                      <option value="Speed Interview">Status: Speed Interview</option>
+                      <option value="Offer Extended">Status: Offer Extended</option>
+                      <option value="Hired">Status: Hired</option>
+                      <option value="Declined">Status: Declined</option>
                     </select>
                   </div>
                 </div>

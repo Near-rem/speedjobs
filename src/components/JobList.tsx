@@ -12,8 +12,12 @@ import {
   ArrowUpDown,
   FilterX
 } from 'lucide-react';
-import { Job, CandidateProfile, RemoteType, UrgencyTier, ExperienceLevel } from '../types';
+import { Job, CandidateProfile } from '../types';
 import { calculateMatchScore } from '../utils/storage';
+import { useI18n } from '../i18n/I18nContext';
+import { sanitizeString } from '../security/sanitizer';
+
+import { UserSession } from '../services/authService';
 
 interface JobListProps {
   jobs: Job[];
@@ -23,6 +27,7 @@ interface JobListProps {
   savedJobIds: string[];
   onToggleSave: (jobId: string) => void;
   profile: CandidateProfile;
+  session: UserSession | null;
 }
 
 export const JobList: React.FC<JobListProps> = ({
@@ -33,7 +38,9 @@ export const JobList: React.FC<JobListProps> = ({
   savedJobIds,
   onToggleSave,
   profile,
+  session,
 }) => {
+  const { t } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [remoteFilter, setRemoteFilter] = useState<string>('All');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('All');
@@ -52,51 +59,32 @@ export const JobList: React.FC<JobListProps> = ({
     }));
   }, [jobs, profile]);
 
-  // Filtered jobs
+  // Filtered jobs with sanitized search query
   const filteredJobs = useMemo(() => {
+    const cleanQuery = sanitizeString(searchTerm).toLowerCase();
+
     return jobsWithScore.filter((job) => {
-      // Search term
-      if (searchTerm) {
-        const query = searchTerm.toLowerCase();
-        const matchesTitle = job.title.toLowerCase().includes(query);
-        const matchesCompany = job.company.toLowerCase().includes(query);
-        const matchesSkill = job.skills.some((s) => s.toLowerCase().includes(query));
-        const matchesLocation = job.location.toLowerCase().includes(query);
+      if (cleanQuery) {
+        const matchesTitle = job.title.toLowerCase().includes(cleanQuery);
+        const matchesCompany = job.company.toLowerCase().includes(cleanQuery);
+        const matchesSkill = job.skills.some((s) => s.toLowerCase().includes(cleanQuery));
+        const matchesLocation = job.location.toLowerCase().includes(cleanQuery);
         if (!matchesTitle && !matchesCompany && !matchesSkill && !matchesLocation) {
           return false;
         }
       }
 
-      // Remote filter
-      if (remoteFilter !== 'All' && job.remoteType !== remoteFilter) {
-        return false;
-      }
+      if (remoteFilter !== 'All' && job.remoteType !== remoteFilter) return false;
+      if (urgencyFilter !== 'All' && job.urgency !== urgencyFilter) return false;
+      if (expFilter !== 'All' && job.experienceLevel !== expFilter) return false;
 
-      // Urgency filter
-      if (urgencyFilter !== 'All' && job.urgency !== urgencyFilter) {
-        return false;
-      }
-
-      // Experience filter
-      if (expFilter !== 'All' && job.experienceLevel !== expFilter) {
-        return false;
-      }
-
-      // Min salary filter
       if (minSalary > 0) {
         const annualEquivalent = job.salaryPeriod === 'hr' ? job.salaryMin * 2000 : job.salaryMin;
         if (annualEquivalent < minSalary) return false;
       }
 
-      // Saved only
-      if (onlySaved && !savedJobIds.includes(job.id)) {
-        return false;
-      }
-
-      // High match only (>80%)
-      if (onlyHighMatch && job.matchScore < 80) {
-        return false;
-      }
+      if (onlySaved && !savedJobIds.includes(job.id)) return false;
+      if (onlyHighMatch && job.matchScore < 80) return false;
 
       return true;
     });
@@ -112,7 +100,7 @@ export const JobList: React.FC<JobListProps> = ({
         const salB = b.salaryPeriod === 'hr' ? b.salaryMax * 2000 : b.salaryMax;
         return salB - salA;
       }
-      return 0; // default order / recent
+      return 0;
     });
   }, [filteredJobs, sortBy]);
 
@@ -146,7 +134,7 @@ export const JobList: React.FC<JobListProps> = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by role, company, or skill (e.g. React, Rust, AI)..."
+              placeholder={t('jobs.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             />
             {searchTerm && (
@@ -154,7 +142,7 @@ export const JobList: React.FC<JobListProps> = ({
                 onClick={() => setSearchTerm('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                Clear
+                {t('jobs.clearSearch')}
               </button>
             )}
           </div>
@@ -168,10 +156,10 @@ export const JobList: React.FC<JobListProps> = ({
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="pl-8 pr-7 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-100 cursor-pointer focus:outline-none"
               >
-                <option value="match">⚡ Best Match</option>
-                <option value="fastest">🚀 Fastest Hire (&lt;24h)</option>
-                <option value="salary">💰 Top Salary</option>
-                <option value="recent">⏱️ Newest</option>
+                <option value="match">{t('jobs.sortMatch')}</option>
+                <option value="fastest">{t('jobs.sortFastest')}</option>
+                <option value="salary">{t('jobs.sortSalary')}</option>
+                <option value="recent">{t('jobs.sortNewest')}</option>
               </select>
             </div>
 
@@ -184,7 +172,7 @@ export const JobList: React.FC<JobListProps> = ({
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              <span>Filter</span>
+              <span>Filtros</span>
             </button>
           </div>
         </div>
@@ -206,7 +194,7 @@ export const JobList: React.FC<JobListProps> = ({
               }`}
             >
               <Flame className="w-3.5 h-3.5 fill-current" />
-              <span>Flash 24h</span>
+              <span>{t('jobs.filterFlash')}</span>
             </button>
 
             <button
@@ -217,7 +205,7 @@ export const JobList: React.FC<JobListProps> = ({
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              Remote Only
+              {t('jobs.filterRemote')}
             </button>
 
             <button
@@ -229,7 +217,7 @@ export const JobList: React.FC<JobListProps> = ({
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Match &gt;80%</span>
+              <span>{t('jobs.filterHighMatch')}</span>
             </button>
 
             <button
@@ -241,24 +229,24 @@ export const JobList: React.FC<JobListProps> = ({
               }`}
             >
               <Bookmark className="w-3.5 h-3.5" />
-              <span>Saved ({savedJobIds.length})</span>
+              <span>{t('jobs.filterSaved')} ({savedJobIds.length})</span>
             </button>
           </div>
 
           {/* Experience level selector */}
           <div className="flex items-center gap-1 ml-auto">
-            <span className="text-slate-400 text-[11px]">Level:</span>
+            <span className="text-slate-400 text-[11px]">{t('jobs.levelLabel')}</span>
             <select
               value={expFilter}
               onChange={(e) => setExpFilter(e.target.value)}
               className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-slate-700 text-xs cursor-pointer focus:outline-none"
             >
-              <option value="All">All Levels</option>
+              <option value="All">{t('jobs.levelAll')}</option>
               <option value="Entry">Entry</option>
               <option value="Junior">Junior</option>
               <option value="Mid">Mid-Level</option>
               <option value="Senior">Senior</option>
-              <option value="Lead">Lead/Staff</option>
+              <option value="Lead">Lead / Staff</option>
             </select>
           </div>
 
@@ -268,7 +256,7 @@ export const JobList: React.FC<JobListProps> = ({
               className="inline-flex items-center gap-1 px-2 py-1 text-slate-500 hover:text-slate-800 text-[11px] font-medium cursor-pointer"
             >
               <FilterX className="w-3.5 h-3.5" />
-              Reset filters
+              {t('jobs.resetFilters')}
             </button>
           )}
         </div>
@@ -277,11 +265,17 @@ export const JobList: React.FC<JobListProps> = ({
       {/* Results Header Info */}
       <div className="flex items-center justify-between px-1 text-xs text-slate-500 font-medium">
         <span>
-          Showing <strong className="text-slate-800">{sortedJobs.length}</strong> express open positions
+          {t('jobs.showingResults', { count: sortedJobs.length })}
         </span>
-        <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-          ⚡ 1-Click Speed Apply enabled
-        </span>
+        {session?.role !== 'empresa' ? (
+          <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+            {t('jobs.speedApplyEnabled')}
+          </span>
+        ) : (
+          <span className="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
+            Visualização de Vagas (Modo Empresa)
+          </span>
+        )}
       </div>
 
       {/* Job Cards Stream */}
@@ -291,15 +285,15 @@ export const JobList: React.FC<JobListProps> = ({
             <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
               <Search className="w-6 h-6" />
             </div>
-            <h4 className="font-bold text-slate-800 text-base">No matching positions found</h4>
+            <h4 className="font-bold text-slate-800 text-base">{t('jobs.noJobsFound')}</h4>
             <p className="text-sm text-slate-500 max-w-sm mx-auto">
-              Try relaxing your filters or search keywords to discover more fast-track roles.
+              {t('jobs.noJobsSub')}
             </p>
             <button
               onClick={clearAllFilters}
               className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 cursor-pointer"
             >
-              Reset all filters
+              {t('jobs.resetFilters')}
             </button>
           </div>
         ) : (
@@ -313,7 +307,6 @@ export const JobList: React.FC<JobListProps> = ({
                 ? `$${job.salaryMin} - $${job.salaryMax}/hr`
                 : `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k/yr`;
 
-            // Color coding for match score
             const matchColor =
               job.matchScore >= 90
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -331,7 +324,7 @@ export const JobList: React.FC<JobListProps> = ({
                     : 'border-slate-200 hover:border-slate-300 hover:shadow-xs'
                 }`}
               >
-                {/* Top card row: Logo, Company, Title, Urgency, Bookmark */}
+                {/* Top card row */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
@@ -364,7 +357,7 @@ export const JobList: React.FC<JobListProps> = ({
                         ? 'border-rose-200 bg-rose-50 text-rose-600'
                         : 'border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                     }`}
-                    title={isSaved ? 'Saved job' : 'Save job'}
+                    title={isSaved ? t('jobs.savedJob') : t('jobs.saveJob')}
                   >
                     <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
                   </button>
@@ -372,7 +365,6 @@ export const JobList: React.FC<JobListProps> = ({
 
                 {/* Key specs pills */}
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                  {/* Urgency Badge */}
                   <span
                     className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded-md ${
                       job.urgency === 'Flash (24h)'
@@ -384,20 +376,17 @@ export const JobList: React.FC<JobListProps> = ({
                     <span>{job.urgency}</span>
                   </span>
 
-                  {/* Match Score Badge */}
                   <span
                     className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded-md border ${matchColor}`}
                   >
                     <span>{job.matchScore}% Match</span>
                   </span>
 
-                  {/* Salary Pill */}
                   <span className="inline-flex items-center gap-1 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
                     <DollarSign className="w-3 h-3 text-slate-500" />
                     <span>{formattedSalary}</span>
                   </span>
 
-                  {/* Location & Remote */}
                   <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                     <MapPin className="w-3 h-3 text-slate-400" />
                     <span>
@@ -406,7 +395,6 @@ export const JobList: React.FC<JobListProps> = ({
                   </span>
                 </div>
 
-                {/* Brief description snippet */}
                 <p className="mt-2.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
                   {job.description}
                 </p>
@@ -441,22 +429,26 @@ export const JobList: React.FC<JobListProps> = ({
                   <div className="flex items-center gap-2 text-slate-500">
                     <Clock className="w-3.5 h-3.5 text-amber-600" />
                     <span>
-                      Hiring in <strong>~{job.hiringSpeedDays} day{job.hiringSpeedDays > 1 ? 's' : ''}</strong>
+                      {t('jobs.decisionGuaranteed', { days: job.hiringSpeedDays })}
                     </span>
-                    <span className="text-slate-300">•</span>
-                    <span>{job.applicantsCount} applicants</span>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSpeedApply(job);
-                    }}
-                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-xs hover:shadow transition-all cursor-pointer"
-                  >
-                    <Zap className="w-3.5 h-3.5 fill-current" />
-                    <span>Speed Apply</span>
-                  </button>
+                  {session?.role !== 'empresa' ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSpeedApply(job);
+                      }}
+                      className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-xs hover:shadow transition-all cursor-pointer"
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      <span>{t('jobs.speedApplyBtn')}</span>
+                    </button>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-400">
+                      Visualizar detalhes →
+                    </span>
+                  )}
                 </div>
               </div>
             );

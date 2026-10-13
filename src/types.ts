@@ -2,6 +2,7 @@ export type RemoteType = 'Remote' | 'Hybrid' | 'On-site';
 export type JobType = 'Full-time' | 'Contract' | 'Part-time' | 'Freelance';
 export type UrgencyTier = 'Flash (24h)' | 'Urgent (48h)' | 'Same-Week' | 'Standard';
 export type ExperienceLevel = 'Entry' | 'Junior' | 'Mid' | 'Senior' | 'Lead';
+export type UserRole = 'funcionario' | 'empresa' | 'admin';
 
 export interface Job {
   id: string;
@@ -27,6 +28,7 @@ export interface Job {
   featured?: boolean;
   speedInterviewAvailable?: boolean;
   department: string;
+  postedByEmail?: string;
 }
 
 export interface CandidateProfile {
@@ -68,6 +70,7 @@ export interface JobApplication {
   pitchNote?: string;
   interviewSlot?: string;
   feedback?: string;
+  candidateEmail?: string;
 }
 
 export interface InterviewSession {

@@ -6,15 +6,12 @@ import {
   RotateCcw,
   Volume2,
   VolumeX,
-  HelpCircle,
   FileText,
   Award,
   Sparkles,
-  CheckCircle2,
-  ChevronRight,
-  Flame,
-  MessageSquare
+  Flame
 } from 'lucide-react';
+import { useI18n } from '../i18n/I18nContext';
 
 interface InterviewSimulatorProps {
   initialJobTitle?: string;
@@ -25,13 +22,12 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
   initialJobTitle = 'Senior Full Stack Engineer',
   initialCompany = 'HyperScale Labs',
 }) => {
+  const { t } = useI18n();
   const [jobTitle, setJobTitle] = useState(initialJobTitle);
   const [company, setCompany] = useState(initialCompany);
 
-  // 15 minutes = 900 seconds
   const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [notes, setNotes] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [completed, setCompleted] = useState<boolean>(false);
@@ -104,7 +100,6 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
   const seconds = timeLeft % 60;
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-  // Current stage calculation
   const elapsed = 15 * 60 - timeLeft;
   let activeStageIndex = 0;
   if (elapsed >= 12 * 60) activeStageIndex = 3;
@@ -124,11 +119,11 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
               <Clock className="w-5 h-5" />
             </span>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              15-Minute Speed Interview Simulator
+              {t('simulator.title')}
             </h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Rehearse high-velocity screening chats. Practice pacing, concise storytelling, and rapid technical delivery.
+            {t('simulator.subtitle')}
           </p>
         </div>
 
@@ -154,12 +149,11 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Timer & Stage Guidance */}
         <div className="lg:col-span-2 space-y-5">
-          {/* Big Digital Timer Card */}
           <div className="p-6 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-xl relative overflow-hidden text-center">
             <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
               <span className="flex items-center gap-1.5">
                 <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-                Live Speed Screen Practice: <strong>{jobTitle}</strong> @ {company}
+                {t('simulator.practiceLabel')}: <strong>{jobTitle}</strong> @ {company}
               </span>
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
@@ -170,7 +164,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
               </button>
             </div>
 
-            {/* Huge Clock */}
+            {/* Clock */}
             <div
               className={`text-6xl sm:text-7xl font-mono font-black tracking-widest my-4 ${
                 timeLeft < 180 ? 'text-amber-400 animate-pulse' : 'text-white'
@@ -179,7 +173,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
               {formattedTime}
             </div>
 
-            {/* Timer Controls */}
+            {/* Controls */}
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={toggleTimer}
@@ -192,12 +186,12 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
                 {isRunning ? (
                   <>
                     <Pause className="w-4 h-4 fill-current" />
-                    <span>Pause Sprint</span>
+                    <span>{t('simulator.pauseSprint')}</span>
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 fill-current" />
-                    <span>{timeLeft === 900 ? 'Start 15-Min Sprint' : 'Resume Sprint'}</span>
+                    <span>{timeLeft === 900 ? t('simulator.startSprint') : t('simulator.resumeSprint')}</span>
                   </>
                 )}
               </button>
@@ -205,7 +199,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
               <button
                 onClick={resetTimer}
                 className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
-                title="Reset timer"
+                title={t('simulator.resetSprint')}
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -260,21 +254,20 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
             <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-slate-700 flex items-start gap-2.5">
               <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-amber-900">Pro Tip for 15-Min Formats:</strong>{' '}
+                <strong className="text-amber-900">{t('simulator.proTip')}</strong>{' '}
                 {currentPrompt.tip}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Col: Live Scratchpad & Self-Evaluation */}
+        {/* Right Col */}
         <div className="space-y-5">
-          {/* Scratchpad */}
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-blue-600" />
-                <span>Candidate Scratchpad</span>
+                <span>{t('simulator.scratchpadTitle')}</span>
               </h3>
               <span className="text-[11px] text-slate-400">Notes & Bullets</span>
             </div>
@@ -282,18 +275,17 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Jot down bullet points, metrics, or questions to ask the interviewer during the sprint..."
+              placeholder={t('simulator.scratchpadPlaceholder')}
               rows={6}
               className="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white resize-none"
             />
           </div>
 
-          {/* Self-Evaluation Scorecard */}
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-amber-500" />
-                <span>Speed Scorecard</span>
+                <span>{t('simulator.scorecardTitle')}</span>
               </h3>
               <span className="text-[11px] text-emerald-600 font-bold">Self-Review</span>
             </div>
@@ -301,7 +293,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
             <div className="space-y-3 text-xs">
               <div>
                 <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                  <span>Clarity & Brevity</span>
+                  <span>{t('simulator.clarityBrevity')}</span>
                   <span className="text-blue-600 font-bold">{ratingClarity}/5</span>
                 </div>
                 <input
@@ -316,7 +308,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
 
               <div>
                 <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                  <span>Technical Depth</span>
+                  <span>{t('simulator.techDepth')}</span>
                   <span className="text-blue-600 font-bold">{ratingDepth}/5</span>
                 </div>
                 <input
@@ -331,7 +323,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
 
               <div>
                 <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                  <span>Pacing & Time Discipline</span>
+                  <span>{t('simulator.pacingDiscipline')}</span>
                   <span className="text-blue-600 font-bold">{ratingPacing}/5</span>
                 </div>
                 <input
@@ -346,7 +338,7 @@ export const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({
             </div>
 
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Overall Readiness:</span>
+              <span className="text-slate-500">{t('simulator.overallReadiness')}</span>
               <span className="font-black text-slate-900 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">
                 {Math.round(((ratingClarity + ratingDepth + ratingPacing) / 15) * 100)}% Match
               </span>

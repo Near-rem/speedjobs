@@ -12,16 +12,18 @@ import {
   ShieldCheck,
   Calendar,
   Sparkles,
-  ChevronRight,
-  ExternalLink,
   Users
 } from 'lucide-react';
 import { Job, CandidateProfile } from '../types';
 import { calculateMatchScore } from '../utils/storage';
+import { useI18n } from '../i18n/I18nContext';
+
+import { UserSession } from '../services/authService';
 
 interface JobDetailProps {
   job: Job | null;
   profile: CandidateProfile;
+  session: UserSession | null;
   isSaved: boolean;
   onToggleSave: (jobId: string) => void;
   onSpeedApply: (job: Job) => void;
@@ -31,11 +33,13 @@ interface JobDetailProps {
 export const JobDetail: React.FC<JobDetailProps> = ({
   job,
   profile,
+  session,
   isSaved,
   onToggleSave,
   onSpeedApply,
   isApplied,
 }) => {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   if (!job) {
@@ -44,9 +48,9 @@ export const JobDetail: React.FC<JobDetailProps> = ({
         <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
           <Zap className="w-8 h-8 fill-blue-600/20 text-blue-600" />
         </div>
-        <h3 className="font-bold text-lg text-slate-800">Select a position to view details</h3>
+        <h3 className="font-bold text-lg text-slate-800">{t('jobs.selectJobPrompt')}</h3>
         <p className="text-sm text-slate-500 max-w-sm">
-          Browse our verified express job listings on the left and apply in 1-click with your candidate SpeedPass.
+          {t('jobs.flashGuarantee')}
         </p>
       </div>
     );
@@ -89,7 +93,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                 <span className="text-xs text-slate-500">{job.department}</span>
                 <span className="text-slate-300">•</span>
                 <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Verified Recruiter
+                  <ShieldCheck className="w-3.5 h-3.5" /> {t('jobs.verifiedRecruiter')}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
@@ -106,7 +110,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Posted {job.postedAt}
+                  {job.postedAt}
                 </span>
               </div>
             </div>
@@ -117,7 +121,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
             <button
               onClick={handleShare}
               className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer relative"
-              title="Share job"
+              title="Share"
             >
               <Share2 className="w-4 h-4" />
               {copied && (
@@ -134,7 +138,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                   ? 'border-rose-200 bg-rose-50 text-rose-600'
                   : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
               }`}
-              title={isSaved ? 'Saved job' : 'Save job'}
+              title={isSaved ? t('jobs.savedJob') : t('jobs.saveJob')}
             >
               <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
             </button>
@@ -155,16 +159,21 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-300">
-                Decision guaranteed in ~{job.hiringSpeedDays} business day{job.hiringSpeedDays > 1 ? 's' : ''}.
+                {t('jobs.decisionGuaranteed', { days: job.hiringSpeedDays })}
               </p>
             </div>
           </div>
 
           <div className="w-full sm:w-auto">
-            {isApplied ? (
+            {session?.role === 'empresa' ? (
+              <div className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold text-xs">
+                <Building2 className="w-4 h-4 shrink-0" />
+                <span>Conta de Empresa: Apenas candidatos podem se candidatar</span>
+              </div>
+            ) : isApplied ? (
               <div className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 rounded-lg bg-emerald-600/30 border border-emerald-500 text-emerald-300 font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Already Applied (Tracking)</span>
+                <span>{t('jobs.alreadyApplied')}</span>
               </div>
             ) : (
               <button
@@ -172,7 +181,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <Zap className="w-4 h-4 fill-white" />
-                <span>1-Click Speed Apply</span>
+                <span>{t('jobs.speedApplyBtn')}</span>
               </button>
             )}
           </div>
@@ -190,7 +199,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
             </div>
             <div className="text-right">
               <span className="text-xl font-black text-blue-700">{matchScore}%</span>
-              <span className="text-xs text-slate-500 ml-1">compatibility</span>
+              <span className="text-xs text-slate-500 ml-1">{t('jobs.compatibility')}</span>
             </div>
           </div>
 
@@ -199,7 +208,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <div className="flex items-center gap-1.5 font-semibold text-emerald-700 mb-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Skills You Match ({matchedSkills.length}/{job.skills.length})</span>
+                <span>{t('jobs.skillsMatch')} ({matchedSkills.length}/{job.skills.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {matchedSkills.length > 0 ? (
@@ -212,16 +221,16 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                     </span>
                   ))
                 ) : (
-                  <span className="text-slate-400">None yet</span>
+                  <span className="text-slate-400">N/A</span>
                 )}
               </div>
             </div>
 
-            {/* Missing or desired skills */}
+            {/* Missing skills */}
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <div className="flex items-center gap-1.5 font-semibold text-amber-700 mb-1.5">
                 <AlertCircle className="w-3.5 h-3.5" />
-                <span>Bonus / To Discuss ({missingSkills.length})</span>
+                <span>{t('jobs.skillsBonus')} ({missingSkills.length})</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {missingSkills.length > 0 ? (
@@ -234,7 +243,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
                     </span>
                   ))
                 ) : (
-                  <span className="text-emerald-600 font-medium">100% full skill coverage!</span>
+                  <span className="text-emerald-600 font-medium">{t('jobs.fullMatch')}</span>
                 )}
               </div>
             </div>
@@ -243,13 +252,13 @@ export const JobDetail: React.FC<JobDetailProps> = ({
 
         {/* Role Description */}
         <div>
-          <h3 className="font-bold text-base text-slate-900 mb-2">About the Role</h3>
+          <h3 className="font-bold text-base text-slate-900 mb-2">{t('jobs.aboutRole')}</h3>
           <p className="leading-relaxed text-slate-600">{job.description}</p>
         </div>
 
         {/* Responsibilities */}
         <div>
-          <h3 className="font-bold text-base text-slate-900 mb-2.5">Key Responsibilities</h3>
+          <h3 className="font-bold text-base text-slate-900 mb-2.5">{t('jobs.responsibilities')}</h3>
           <ul className="space-y-2 text-slate-600">
             {job.responsibilities.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2.5">
@@ -262,7 +271,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
 
         {/* Requirements */}
         <div>
-          <h3 className="font-bold text-base text-slate-900 mb-2.5">What We Look For</h3>
+          <h3 className="font-bold text-base text-slate-900 mb-2.5">{t('jobs.requirements')}</h3>
           <ul className="space-y-2 text-slate-600">
             {job.requirements.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2.5">
@@ -275,7 +284,7 @@ export const JobDetail: React.FC<JobDetailProps> = ({
 
         {/* Benefits */}
         <div>
-          <h3 className="font-bold text-base text-slate-900 mb-2.5">SpeedJobs Benefits & Perks</h3>
+          <h3 className="font-bold text-base text-slate-900 mb-2.5">{t('jobs.benefits')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {job.benefits.map((benefit, idx) => (
               <div
@@ -311,7 +320,8 @@ export const JobDetail: React.FC<JobDetailProps> = ({
             </div>
 
             <div className="text-xs text-slate-600 bg-white px-3 py-2 rounded-lg border border-slate-200">
-              <span className="font-bold text-slate-800">100% Express Response:</span> Candidates hear back within {job.hiringSpeedDays * 24} hours.
+              <span className="font-bold text-slate-800">100% Express Response:</span>{' '}
+              {t('jobs.flashGuarantee')}
             </div>
           </div>
         </div>

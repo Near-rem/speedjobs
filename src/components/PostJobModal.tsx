@@ -7,21 +7,31 @@ import {
   Building2,
   MapPin,
   Clock,
-  Plus
+  Plus,
+  ShieldCheck
 } from 'lucide-react';
 import { Job, UrgencyTier, RemoteType, JobType, ExperienceLevel } from '../types';
+import { useI18n } from '../i18n/I18nContext';
+import { sanitizeString } from '../security/sanitizer';
+import { csrfService } from '../security/csrf';
+
+import { UserSession, authService } from '../services/authService';
 
 interface PostJobModalProps {
   isOpen: boolean;
+  session: UserSession | null;
   onClose: () => void;
   onJobCreated: (job: Job) => void;
 }
 
 export const PostJobModal: React.FC<PostJobModalProps> = ({
   isOpen,
+  session,
   onClose,
   onJobCreated,
 }) => {
+  const { t } = useI18n();
+
   if (!isOpen) return null;
 
   const [title, setTitle] = useState('');
@@ -39,8 +49,8 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
   const [skillsStr, setSkillsStr] = useState('React, TypeScript, Node.js, Tailwind CSS');
   const [description, setDescription] = useState('');
   const [hiringSpeedDays, setHiringSpeedDays] = useState(1);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Template fillers
   const fillTemplate = (preset: 'fullstack' | 'ai' | 'design') => {
     if (preset === 'fullstack') {
       setTitle('Senior Full Stack Architect (React & Go)');
@@ -95,27 +105,42 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
+
+    // Strict RBAC: Only Empresa role can post jobs
+    const rbacCheck = authService.assertCanPostJobs(session);
+    if (!rbacCheck.allowed) {
+      setErrorMsg(rbacCheck.error || 'Acesso negado: apenas perfis de Empresa podem publicar vagas.');
+      return;
+    }
+
+    // CSRF Check
+    const token = csrfService.getToken();
+    if (!csrfService.validateToken(token)) {
+      setErrorMsg(t('auth.csrfError'));
+      return;
+    }
 
     const skills = skillsStr
       .split(',')
-      .map((s) => s.trim())
+      .map((s) => sanitizeString(s))
       .filter(Boolean);
 
     const newJob: Job = {
       id: `job-${Date.now()}`,
-      title: title || 'Senior Software Engineer',
-      company: company || 'FastGrowth Tech',
+      title: sanitizeString(title) || 'Senior Software Engineer',
+      company: sanitizeString(company) || 'FastGrowth Tech',
       logo: logo || '⚡',
-      location: location || 'Remote',
+      location: sanitizeString(location) || 'Remote',
       remoteType,
-      salaryMin: Number(salaryMin) || 120000,
-      salaryMax: Number(salaryMax) || 160000,
+      salaryMin: Math.max(0, Number(salaryMin) || 120000),
+      salaryMax: Math.max(0, Number(salaryMax) || 160000),
       salaryPeriod,
       jobType,
       urgency,
       skills: skills.length > 0 ? skills : ['React', 'TypeScript'],
       experienceLevel,
-      description: description || 'High velocity position with express hiring timeline.',
+      description: sanitizeString(description) || 'High velocity position with express hiring timeline.',
       responsibilities: [
         'Ship high quality features in continuous integration environment',
         'Participate in rapid technical architecture reviews',
@@ -132,11 +157,11 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
         'Remote equipment allowance'
       ],
       postedAt: 'Just now',
-      hiringSpeedDays: Number(hiringSpeedDays) || 1,
+      hiringSpeedDays: Math.max(1, Number(hiringSpeedDays) || 1),
       applicantsCount: 0,
       featured: true,
       speedInterviewAvailable: true,
-      department: department || 'Engineering'
+      department: sanitizeString(department) || 'Engineering'
     };
 
     onJobCreated(newJob);
@@ -153,9 +178,9 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
               <Zap className="w-5 h-5 fill-current" />
             </div>
             <div>
-              <h3 className="font-bold text-base leading-tight">Post a Speed Job</h3>
+              <h3 className="font-bold text-base leading-tight">{t('employer.postModalTitle')}</h3>
               <p className="text-xs text-slate-300">
-                Express listing with 24-48 hour candidate turnaround guarantee
+                {t('employer.postModalSubtitle')}
               </p>
             </div>
           </div>
@@ -170,7 +195,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
 
         {/* Quick Template Fillers */}
         <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2 flex-wrap text-xs shrink-0">
-          <span className="font-semibold text-slate-500">Fast Templates:</span>
+          <span className="font-semibold text-slate-500">{t('employer.fastTemplates')}</span>
           <button
             type="button"
             onClick={() => fillTemplate('fullstack')}
@@ -196,33 +221,39 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-xs">
+          {errorMsg && (
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg">
+              {errorMsg}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Job Title</label>
+              <label className="block font-semibold text-slate-700 mb-1">Cargo / Posição</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Senior Frontend Engineer"
+                placeholder="ex: Senior Frontend Engineer"
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Company Name</label>
+              <label className="block font-semibold text-slate-700 mb-1">Empresa</label>
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                placeholder="e.g. HyperScale Tech"
+                placeholder="ex: HyperScale Tech"
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Logo Emoji / Icon</label>
+              <label className="block font-semibold text-slate-700 mb-1">Emoji / Logo</label>
               <input
                 type="text"
                 value={logo}
@@ -232,7 +263,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Department</label>
+              <label className="block font-semibold text-slate-700 mb-1">Departamento</label>
               <input
                 type="text"
                 value={department}
@@ -243,7 +274,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Workplace Setting</label>
+              <label className="block font-semibold text-slate-700 mb-1">Modalidade</label>
               <select
                 value={remoteType}
                 onChange={(e) => setRemoteType(e.target.value as any)}
@@ -256,7 +287,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Location</label>
+              <label className="block font-semibold text-slate-700 mb-1">Localização</label>
               <input
                 type="text"
                 value={location}
@@ -266,7 +297,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Urgency Tier</label>
+              <label className="block font-semibold text-slate-700 mb-1">Nível de Urgência</label>
               <select
                 value={urgency}
                 onChange={(e) => {
@@ -275,14 +306,14 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
                 }}
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-amber-800"
               >
-                <option value="Flash (24h)">⚡ Flash (24h Response)</option>
-                <option value="Urgent (48h)">⚡ Urgent (48h Response)</option>
-                <option value="Same-Week">Same-Week Hiring</option>
+                <option value="Flash (24h)">⚡ Flash (24h)</option>
+                <option value="Urgent (48h)">⚡ Urgent (48h)</option>
+                <option value="Same-Week">Same-Week</option>
               </select>
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Experience Level</label>
+              <label className="block font-semibold text-slate-700 mb-1">Senioridade</label>
               <select
                 value={experienceLevel}
                 onChange={(e) => setExperienceLevel(e.target.value as any)}
@@ -297,7 +328,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Min Salary / Rate</label>
+              <label className="block font-semibold text-slate-700 mb-1">Salário Mínimo ($ USD)</label>
               <input
                 type="number"
                 value={salaryMin}
@@ -307,7 +338,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Max Salary / Rate</label>
+              <label className="block font-semibold text-slate-700 mb-1">Salário Máximo ($ USD)</label>
               <input
                 type="number"
                 value={salaryMax}
@@ -319,7 +350,7 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
 
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Required Skills (comma separated)
+              Habilidades Requeridas (separadas por vírgula)
             </label>
             <input
               type="text"
@@ -331,32 +362,38 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Job Description & Mission</label>
+            <label className="block font-semibold text-slate-700 mb-1">Missão & Descrição da Vaga</label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg resize-none"
-              placeholder="Tell candidates what they will ship in the first 2 weeks..."
+              placeholder="Descreva o que o profissional irá construir nos primeiros 30 dias..."
               required
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <Zap className="w-4 h-4 fill-white" />
-              <span>Publish Flash Job</span>
-            </button>
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-[11px] text-emerald-600 flex items-center gap-1 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5" /> Proteção Anti-Injection Ativa
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer transition-all"
+              >
+                <Zap className="w-4 h-4 fill-white" />
+                <span>{t('employer.publishBtn')}</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
