@@ -1,0 +1,8 @@
+{
+  "name": "SpeedJobs",
+  "description": "Lightning-fast hiring platform for express job matches, 1-click applications, flash hiring, and rapid interviews.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ],
+  "permissions": []
+}
