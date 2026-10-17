@@ -11,8 +11,23 @@
     <meta name="description" content="Lightning-fast hiring platform for express job matches, 1-click applications, flash hiring, and rapid interviews." />
     <meta property="og:title" content="SpeedJobs" />
     <meta property="og:description" content="Lightning-fast hiring platform for express job matches, 1-click applications, flash hiring, and rapid interviews." />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('speedjobs_theme_preference');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (saved === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-slate-100/70 text-slate-900 antialiased selection:bg-blue-600 selection:text-white min-h-screen">
+  <body class="bg-slate-100/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white min-h-screen transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { I18nProvider, useI18n } from './i18n/I18nContext';
+import { ThemeProvider } from './theme/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { CompanyProfilePage } from './pages/CompanyProfilePage';
 import { JobList } from './components/JobList';
 import { JobDetail } from './components/JobDetail';
 import { SpeedApplyModal } from './components/SpeedApplyModal';
@@ -178,7 +180,7 @@ function SpeedJobsMain() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100/70 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-100/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Global Header with SpeedJobs Brand, Language Selector, and Action Buttons */}
       <Navbar
         currentRoute={currentRoute}
@@ -188,6 +190,7 @@ function SpeedJobsMain() {
         session={session}
         onOpenSecurity={() => setSecurityModalOpen(true)}
         onLogout={handleLogout}
+        onOpenPostJob={() => setIsPostJobOpen(true)}
       />
 
       {/* Main View Router */}
@@ -306,6 +309,15 @@ function SpeedJobsMain() {
             }}
           />
         )}
+
+        {/* ROUTE: /meu-perfil (Company Profile - Mandatory to post jobs) */}
+        {currentRoute === '/meu-perfil' && (
+          <CompanyProfilePage
+            session={session}
+            onNavigate={navigate}
+            onOpenPostJob={() => setIsPostJobOpen(true)}
+          />
+        )}
       </main>
 
       {/* Security & Compliance Footer */}
@@ -350,6 +362,7 @@ function SpeedJobsMain() {
         session={session}
         onClose={() => setIsPostJobOpen(false)}
         onJobCreated={handleJobCreated}
+        onGoToCompanyProfile={() => navigate('/meu-perfil')}
       />
 
       {/* Security & Audit Modal */}
@@ -364,7 +377,9 @@ function SpeedJobsMain() {
 export function App() {
   return (
     <I18nProvider>
-      <SpeedJobsMain />
+      <ThemeProvider>
+        <SpeedJobsMain />
+      </ThemeProvider>
     </I18nProvider>
   );
 }

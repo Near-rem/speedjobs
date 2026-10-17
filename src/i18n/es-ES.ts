@@ -191,4 +191,11 @@ export const esES: TranslationDictionary = {
     cspStatus: 'Política de Seguridad de Contenido (CSP)',
     encryptionStandard: 'Estándar Criptográfico',
   },
+  theme: {
+    light: 'Modo Claro',
+    dark: 'Modo Oscuro',
+    system: 'Seguir Sistema',
+    toggle: 'Alternar Modo Oscuro/Claro',
+    mode: 'Tema de la Interfaz',
+  },
 };

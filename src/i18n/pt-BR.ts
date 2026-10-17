@@ -191,4 +191,11 @@ export const ptBR: TranslationDictionary = {
     cspStatus: 'Política de Segurança de Conteúdo (CSP)',
     encryptionStandard: 'Padrão Criptográfico',
   },
+  theme: {
+    light: 'Modo Claro',
+    dark: 'Modo Escuro',
+    system: 'Seguir Sistema',
+    toggle: 'Alternar Modo Escuro/Claro',
+    mode: 'Tema da Interface',
+  },
 };

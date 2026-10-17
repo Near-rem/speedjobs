@@ -12,12 +12,16 @@ import {
   LogOut,
   ShieldCheck,
   User,
-  Home
+  Home,
+  Store,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { CandidateProfile, JobApplication } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { SupportedLocale } from '../i18n/types';
 import { UserSession } from '../services/authService';
+import { useTheme } from '../theme/ThemeContext';
 
 interface NavbarProps {
   currentRoute: string;
@@ -27,6 +31,7 @@ interface NavbarProps {
   session: UserSession | null;
   onOpenSecurity: () => void;
   onLogout: () => void;
+  onOpenPostJob?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,8 +42,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   session,
   onOpenSecurity,
   onLogout,
+  onOpenPostJob,
 }) => {
   const { locale, setLocale, t } = useI18n();
+  const { isDark, toggleTheme } = useTheme();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
 
   const activeAppCount = applications.filter(
@@ -55,17 +62,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isRoleFuncionario = session?.role === 'funcionario';
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-      {/* Top security marquee */}
-      <div className="bg-slate-900 text-white text-xs py-1.5 px-4 font-medium flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors duration-200">
+      {/* Top security & utilities marquee */}
+      <div className="bg-slate-900 dark:bg-slate-950 text-white text-xs py-1.5 px-4 font-medium flex items-center justify-between border-b border-slate-800/80">
         <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
           <span className="inline-flex items-center gap-1 bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider">
             <Zap className="w-3 h-3 fill-current" /> {t('brand.expressBadge')}
           </span>
-          <span className="text-slate-300">{t('brand.guaranteeBanner')}</span>
+          <span className="text-slate-300 hidden sm:inline">{t('brand.guaranteeBanner')}</span>
         </div>
 
-        <div className="flex items-center gap-4 text-xs shrink-0">
+        <div className="flex items-center gap-3 text-xs shrink-0">
           {/* Security Center Link */}
           <button
             onClick={onOpenSecurity}
@@ -73,6 +80,26 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>OWASP Blindado</span>
+          </button>
+
+          {/* Theme Quick Toggle (Top bar) */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer transition-colors"
+            title={isDark ? t('theme.light') : t('theme.dark')}
+            aria-label={t('theme.toggle')}
+          >
+            {isDark ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden xs:inline text-[11px] font-medium text-amber-300">{t('theme.light')}</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-indigo-300" />
+                <span className="hidden xs:inline text-[11px] font-medium text-slate-300">{t('theme.dark')}</span>
+              </>
+            )}
           </button>
 
           {/* Language Switcher */}
@@ -88,7 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {langMenuOpen && (
-              <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 text-slate-800 text-xs animate-in fade-in">
+              <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 text-slate-800 dark:text-slate-100 text-xs animate-in fade-in">
                 {languages.map((l) => (
                   <button
                     key={l.code}
@@ -96,8 +123,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setLocale(l.code);
                       setLangMenuOpen(false);
                     }}
-                    className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 cursor-pointer ${
-                      locale === l.code ? 'font-bold text-blue-600 bg-blue-50/50' : ''
+                    className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer ${
+                      locale === l.code ? 'font-bold text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30' : ''
                     }`}
                   >
                     <span>{l.flag}</span>
@@ -123,14 +150,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Zap className="w-6 h-6 fill-white" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5 font-black text-xl tracking-tight text-slate-900">
+                <div className="flex items-center gap-1.5 font-black text-xl tracking-tight text-slate-900 dark:text-white">
                   <span>Speed</span>
-                  <span className="text-blue-600">Jobs</span>
-                  <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full uppercase">
+                  <span className="text-blue-600 dark:text-blue-400">Jobs</span>
+                  <span className="text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full uppercase">
                     PRO
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium leading-none">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-none">
                   {t('brand.tagline')}
                 </p>
               </div>
@@ -142,8 +169,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => onNavigate('/')}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                   currentRoute === '/'
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
@@ -154,8 +181,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => onNavigate('/vagas')}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                   currentRoute === '/vagas'
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
@@ -169,8 +196,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => onNavigate('/fast-tracker')}
                     className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       currentRoute === '/fast-tracker'
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" />
@@ -186,8 +213,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => onNavigate('/speedpass')}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       currentRoute === '/speedpass'
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <UserCheck className="w-3.5 h-3.5" />
@@ -198,11 +225,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => onNavigate('/simulador')}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       currentRoute === '/simulador'
-                        ? 'bg-amber-50 text-amber-800'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
-                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                     <span>Simulador 15-Min</span>
                   </button>
                 </>
@@ -210,41 +237,75 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* ROLE RESTRICTIONS: Empresa Only */}
               {isRoleEmpresa && (
-                <button
-                  onClick={() => onNavigate('/empresa')}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    currentRoute === '/empresa'
-                      ? 'bg-amber-50 text-amber-800 font-black'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  <Building2 className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Painel da Empresa</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => onNavigate('/empresa')}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      currentRoute === '/empresa'
+                        ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-black'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>Painel da Empresa</span>
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate('/meu-perfil')}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      currentRoute === '/meu-perfil'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Store className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>Meu Perfil</span>
+                    <span className="text-[10px] bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-200 px-1.5 py-0.2 rounded font-extrabold uppercase">
+                      Obrigatório
+                    </span>
+                  </button>
+                </>
               )}
             </nav>
           </div>
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2.5">
-            {/* Empresa Only button: Publicar Vaga */}
+            {/* Theme Toggle Button in Desktop Header */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title={isDark ? t('theme.light') : t('theme.dark')}
+              aria-label={t('theme.toggle')}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 animate-in spin-in-180 duration-300" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300 animate-in spin-in-180 duration-300" />
+              )}
+            </button>
+
+            {/* Empresa Only button: Publicar Vaga (R$ 1,00) */}
             {isRoleEmpresa && (
               <button
-                onClick={() => onNavigate('/empresa')}
-                className="hidden sm:inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all hover:shadow cursor-pointer"
+                onClick={() => (onOpenPostJob ? onOpenPostJob() : onNavigate('/empresa'))}
+                className="hidden sm:inline-flex items-center gap-1.5 bg-gradient-to-r from-slate-900 to-indigo-950 hover:from-slate-800 hover:to-indigo-900 text-white px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-xs transition-all hover:shadow cursor-pointer border border-slate-700 dark:border-slate-600"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>+ Publicar Vaga Flash</span>
+                <span>+ Publicar Vaga</span>
+                <span className="bg-amber-500 text-slate-950 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  R$ 1,00
+                </span>
               </button>
             )}
 
             {/* Authenticated user vs Guest */}
             {session ? (
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                   <span className={`w-2 h-2 rounded-full ${isRoleEmpresa ? 'bg-amber-500' : 'bg-blue-600'}`}></span>
                   <div className="text-left text-xs leading-none">
-                    <span className="font-bold text-slate-800 block truncate max-w-[110px]">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 block truncate max-w-[110px]">
                       {session.name}
                     </span>
                     <span className="text-[10px] text-slate-400 uppercase font-semibold">
@@ -255,7 +316,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={onLogout}
-                  className="p-2 border border-slate-200 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                  className="p-2 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
                   title="Sair com Segurança"
                 >
                   <LogOut className="w-4 h-4" />
@@ -265,7 +326,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onNavigate('/login')}
-                  className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Entrar
                 </button>
@@ -282,11 +343,11 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile Nav Tabs Bar */}
-      <div className="lg:hidden flex items-center justify-around border-t border-slate-200 bg-slate-50/90 px-2 py-1.5 overflow-x-auto text-xs">
+      <div className="lg:hidden flex items-center justify-around border-t border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/95 px-2 py-1.5 overflow-x-auto text-xs">
         <button
           onClick={() => onNavigate('/')}
           className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
-            currentRoute === '/' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-600'
+            currentRoute === '/' ? 'bg-white dark:bg-slate-800 shadow-xs text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-600 dark:text-slate-400'
           }`}
         >
           Início
@@ -294,27 +355,37 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => onNavigate('/vagas')}
           className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
-            currentRoute === '/vagas' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-600'
+            currentRoute === '/vagas' ? 'bg-white dark:bg-slate-800 shadow-xs text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-600 dark:text-slate-400'
           }`}
         >
           Vagas
         </button>
 
         {isRoleEmpresa ? (
-          <button
-            onClick={() => onNavigate('/empresa')}
-            className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
-              currentRoute === '/empresa' ? 'bg-white shadow-xs text-amber-700 font-bold' : 'text-slate-600'
-            }`}
-          >
-            Empresa
-          </button>
+          <>
+            <button
+              onClick={() => onNavigate('/empresa')}
+              className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
+                currentRoute === '/empresa' ? 'bg-white dark:bg-slate-800 shadow-xs text-amber-700 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              Painel
+            </button>
+            <button
+              onClick={() => onNavigate('/meu-perfil')}
+              className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
+                currentRoute === '/meu-perfil' ? 'bg-white dark:bg-slate-800 shadow-xs text-amber-700 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              Meu Perfil
+            </button>
+          </>
         ) : (
           <>
             <button
               onClick={() => onNavigate('/fast-tracker')}
               className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
-                currentRoute === '/fast-tracker' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-600'
+                currentRoute === '/fast-tracker' ? 'bg-white dark:bg-slate-800 shadow-xs text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-600 dark:text-slate-400'
               }`}
             >
               Tracker ({activeAppCount})
@@ -322,13 +393,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => onNavigate('/speedpass')}
               className={`px-3 py-1.5 rounded-md font-medium cursor-pointer ${
-                currentRoute === '/speedpass' ? 'bg-white shadow-xs text-blue-600 font-bold' : 'text-slate-600'
+                currentRoute === '/speedpass' ? 'bg-white dark:bg-slate-800 shadow-xs text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-600 dark:text-slate-400'
               }`}
             >
               SpeedPass
             </button>
           </>
         )}
+
+        {/* Mobile quick theme switcher */}
+        <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          title={isDark ? t('theme.light') : t('theme.dark')}
+        >
+          {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600" />}
+        </button>
       </div>
     </header>
   );

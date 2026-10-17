@@ -92,16 +92,16 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
         {/* Back Link */}
         <button
           onClick={() => onNavigate('/')}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Voltar para a Página Inicial</span>
         </button>
 
         {/* Card Container */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-colors">
           {/* Header */}
-          <div className="p-6 bg-slate-900 text-white text-center space-y-2 border-b border-slate-800">
+          <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white text-center space-y-2 border-b border-slate-800">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-500 mx-auto flex items-center justify-center shadow-md">
               <UserCheck className="w-6 h-6 text-white" />
             </div>
@@ -114,8 +114,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
           <div className="p-6 sm:p-8 space-y-6">
             {/* Error Notice */}
             {errorMsg && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -123,7 +123,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
             <form onSubmit={handleSubmit} className="space-y-5 text-xs">
               {/* EXPLICIT ROLE SELECTOR */}
               <div className="space-y-2">
-                <label className="block font-bold text-slate-900 text-xs">
+                <label className="block font-bold text-slate-900 dark:text-white text-xs">
                   1. Escolha o Tipo de Conta <span className="text-rose-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -132,19 +132,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                     onClick={() => setRole('funcionario')}
                     className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                       role === 'funcionario'
-                        ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                        ? 'border-blue-600 bg-blue-50/60 dark:bg-blue-950/40 ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 flex items-center justify-center">
                         <User className="w-5 h-5" />
                       </div>
                       <span
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           role === 'funcionario'
                             ? 'border-blue-600 bg-blue-600'
-                            : 'border-slate-300'
+                            : 'border-slate-300 dark:border-slate-600'
                         }`}
                       >
                         {role === 'funcionario' && (
@@ -154,13 +154,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                     </div>
 
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Funcionário / Candidato</h4>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-sm">Funcionário / Candidato</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                         Busca vagas e se candidata com SpeedPass.
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100/80 text-[10px] text-rose-600 font-semibold">
+                    <div className="pt-2 border-t border-slate-100/80 dark:border-slate-700/80 text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
                       ⚠️ Restrição: Não pode publicar vagas.
                     </div>
                   </div>
@@ -170,19 +170,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                     onClick={() => setRole('empresa')}
                     className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                       role === 'empresa'
-                        ? 'border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                        ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/40 ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 flex items-center justify-center">
                         <Building2 className="w-5 h-5" />
                       </div>
                       <span
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           role === 'empresa'
                             ? 'border-amber-600 bg-amber-600'
-                            : 'border-slate-300'
+                            : 'border-slate-300 dark:border-slate-600'
                         }`}
                       >
                         {role === 'empresa' && (
@@ -192,13 +192,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                     </div>
 
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Empresa / Contratante</h4>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-sm">Empresa / Contratante</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                         Cria vagas, gerencia candidatos e faz ofertas.
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100/80 text-[10px] text-rose-600 font-semibold">
+                    <div className="pt-2 border-t border-slate-100/80 dark:border-slate-700/80 text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
                       ⚠️ Restrição: Não pode se candidatar a vagas.
                     </div>
                   </div>
@@ -206,82 +206,82 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
               </div>
 
               {/* 2. REGISTRATION DETAILS */}
-              <div className="space-y-3.5 pt-2 border-t border-slate-100">
-                <label className="block font-bold text-slate-900 text-xs">
+              <div className="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <label className="block font-bold text-slate-900 dark:text-white text-xs">
                   2. Dados do Usuário & Acesso
                 </label>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.fullNameLabel')}
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <input
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder={t('auth.fullNamePlaceholder')}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                 </div>
 
                 {role === 'empresa' && (
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Nome da Empresa / Organização
                     </label>
                     <div className="relative">
-                      <Building2 className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <Building2 className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                       <input
                         type="text"
                         required
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
                         placeholder="Ex: HyperScale Labs Ltda"
-                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.emailLabel')}
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={t('auth.emailPlaceholder')}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.passwordLabel')}
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('auth.passwordPlaceholder')}
-                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -290,40 +290,40 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                   {password && (
                     <div className="mt-2 space-y-1">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500">Força da Senha:</span>
+                        <span className="text-slate-500 dark:text-slate-400">Força da Senha:</span>
                         <span
                           className={`font-bold ${
                             passwordStrength.level === 'strong'
-                              ? 'text-emerald-600'
+                              ? 'text-emerald-600 dark:text-emerald-400'
                               : passwordStrength.level === 'good'
-                              ? 'text-blue-600'
+                              ? 'text-blue-600 dark:text-blue-400'
                               : passwordStrength.level === 'fair'
-                              ? 'text-amber-600'
-                              : 'text-rose-600'
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : 'text-rose-600 dark:text-rose-400'
                           }`}
                         >
                           {passwordStrength.level.toUpperCase()}
                         </span>
                       </div>
-                      <div className="grid grid-cols-4 gap-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="grid grid-cols-4 gap-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className={`h-full ${
-                            passwordStrength.score >= 1 ? 'bg-rose-500' : 'bg-slate-200'
+                            passwordStrength.score >= 1 ? 'bg-rose-500' : 'bg-slate-200 dark:bg-slate-700'
                           }`}
                         ></div>
                         <div
                           className={`h-full ${
-                            passwordStrength.score >= 2 ? 'bg-amber-500' : 'bg-slate-200'
+                            passwordStrength.score >= 2 ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'
                           }`}
                         ></div>
                         <div
                           className={`h-full ${
-                            passwordStrength.score >= 3 ? 'bg-blue-500' : 'bg-slate-200'
+                            passwordStrength.score >= 3 ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'
                           }`}
                         ></div>
                         <div
                           className={`h-full ${
-                            passwordStrength.score >= 4 ? 'bg-emerald-500' : 'bg-slate-200'
+                            passwordStrength.score >= 4 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
                           }`}
                         ></div>
                       </div>
@@ -332,24 +332,24 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.confirmPasswordLabel')}
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder={t('auth.confirmPasswordPlaceholder')}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                 </div>
               </div>
 
-              <label className="flex items-start gap-2 cursor-pointer text-slate-600 pt-1">
+              <label className="flex items-start gap-2 cursor-pointer text-slate-600 dark:text-slate-300 pt-1">
                 <input
                   type="checkbox"
                   required
@@ -375,12 +375,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onNavigat
                 )}
               </button>
 
-              <div className="pt-2 text-center text-slate-500 border-t border-slate-100">
+              <div className="pt-2 text-center text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
                 {t('auth.hasAccount')}{' '}
                 <button
                   type="button"
                   onClick={() => onNavigate('/login')}
-                  className="font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+                  className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
                 >
                   {t('nav.signIn')}
                 </button>

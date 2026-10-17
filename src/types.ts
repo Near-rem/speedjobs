@@ -29,6 +29,46 @@ export interface Job {
   speedInterviewAvailable?: boolean;
   department: string;
   postedByEmail?: string;
+  paidPostFee?: boolean;
+  paymentId?: string;
+  companyTaxId?: string;
+}
+
+export interface CompanyWorkingHours {
+  days: string[]; // ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  openTime: string; // '08:00'
+  closeTime: string; // '18:00'
+  lunchBreak?: string; // '12:00 às 13:00'
+  notes?: string;
+}
+
+export interface CompanyLocation {
+  cep: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  fullAddress: string;
+}
+
+export interface CompanyProfile {
+  id?: string;
+  companyName: string; // Razão Social
+  tradeName: string; // Nome Fantasia
+  taxId: string; // CNPJ ou MEI (formatado 00.000.000/0000-00)
+  taxIdType: 'CNPJ' | 'MEI';
+  logoUrl: string; // Foto / Logo da Empresa
+  location: CompanyLocation;
+  workingHours: CompanyWorkingHours;
+  phone: string;
+  email: string;
+  website?: string;
+  industry: string;
+  description: string;
+  isComplete: boolean;
+  updatedAt: string;
 }
 
 export interface CandidateProfile {
@@ -86,3 +126,4 @@ export interface InterviewSession {
   meetingLink: string;
   notes?: string;
 }
+

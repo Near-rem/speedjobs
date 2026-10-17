@@ -36,7 +36,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const { t } = useI18n();
 
   return (
-    <div className="space-y-16 pb-16">
+    <div className="space-y-16 pb-16 transition-colors duration-200">
       {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-indigo-950 text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
         {/* Subtle background effects */}
@@ -94,7 +94,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             ) : session.role === 'empresa' ? (
               <button
                 onClick={() => onNavigate('/empresa')}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-8 py-4 rounded-xl text-sm transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-8 py-4 rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-amber-500/20"
               >
                 <Building2 className="w-4 h-4" />
                 <span>Painel da Empresa ({session.companyName || session.name})</span>
@@ -102,7 +102,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             ) : (
               <button
                 onClick={() => onNavigate('/speedpass')}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold px-8 py-4 rounded-xl text-sm transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold px-8 py-4 rounded-xl text-sm transition-all cursor-pointer shadow-lg"
               >
                 <Zap className="w-4 h-4 text-amber-400 fill-current" />
                 <span>Meu SpeedPass ({session.name})</span>
@@ -127,26 +127,26 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* METRICS & STATS */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white rounded-2xl p-6 shadow-xl border border-slate-200/80">
-          <div className="p-3 text-center sm:text-left border-r border-slate-100 last:border-0">
-            <div className="text-3xl font-black text-slate-900 tracking-tight">18 Horas</div>
-            <div className="text-xs font-semibold text-slate-500 mt-0.5">Tempo Médio de Resposta</div>
-            <div className="text-[11px] text-emerald-600 font-bold mt-1">⚡ 4x mais veloz</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl border border-slate-200/80 dark:border-slate-800 transition-colors">
+          <div className="p-3 text-center sm:text-left border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">18 Horas</div>
+            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Tempo Médio de Resposta</div>
+            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">⚡ 4x mais veloz</div>
           </div>
-          <div className="p-3 text-center sm:text-left border-r border-slate-100 last:border-0">
-            <div className="text-3xl font-black text-slate-900 tracking-tight">1.450+</div>
-            <div className="text-xs font-semibold text-slate-500 mt-0.5">Vagas Flash Publicadas</div>
-            <div className="text-[11px] text-blue-600 font-bold mt-1">SLA de 24h a 48h</div>
+          <div className="p-3 text-center sm:text-left border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">1.450+</div>
+            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Vagas Flash Publicadas</div>
+            <div className="text-[11px] text-blue-600 dark:text-blue-400 font-bold mt-1">SLA de 24h a 48h</div>
           </div>
-          <div className="p-3 text-center sm:text-left border-r border-slate-100 last:border-0">
-            <div className="text-3xl font-black text-slate-900 tracking-tight">98.4%</div>
-            <div className="text-xs font-semibold text-slate-500 mt-0.5">Índice de Retorno</div>
-            <div className="text-[11px] text-indigo-600 font-bold mt-1">Sem candidaturas ignoradas</div>
+          <div className="p-3 text-center sm:text-left border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">98.4%</div>
+            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Índice de Retorno</div>
+            <div className="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold mt-1">Sem candidaturas ignoradas</div>
           </div>
           <div className="p-3 text-center sm:text-left">
-            <div className="text-3xl font-black text-slate-900 tracking-tight">256-bit</div>
-            <div className="text-xs font-semibold text-slate-500 mt-0.5">Criptografia PBKDF2</div>
-            <div className="text-[11px] text-emerald-600 font-bold mt-1">OWASP Top 10 Blindado</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">256-bit</div>
+            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Criptografia PBKDF2</div>
+            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">OWASP Top 10 Blindado</div>
           </div>
         </div>
       </section>
@@ -154,54 +154,54 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* DUAL VALUE PROPOSITION (Empresas vs Funcionários) */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Perfis Desenhados para Alta Eficiência
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Estrutura rígida de permissões e segurança adaptada às necessidades de cada lado da contratação.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card Candidato / Funcionário */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs hover:shadow-md transition-shadow space-y-6 flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs hover:shadow-md transition-all space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
+                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
                   Para Profissionais & Talentos
                 </span>
-                <h3 className="text-xl font-black text-slate-900 mt-1">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1">
                   Perfil Funcionário / Candidato
                 </h3>
-                <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
                   Crie seu <strong>SpeedPass™</strong> com suas tecnologias verificadas, pretensão salarial e disponibilidade. Candidate-se em 1-clique sem preencher formulários repetitivos.
                 </p>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-slate-600 pt-2">
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 pt-2">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Candidatura instantânea com SpeedPass</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Acompanhamento no Fast Tracker com status transparente</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Simulador de Entrevista de 15 Minutos para treino de ritmo</span>
                 </li>
               </ul>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400 font-medium">Restrição: Não publica vagas</span>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Restrição: Não publica vagas</span>
               <button
                 onClick={() => onNavigate('/vagas')}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
               >
                 <span>Ver Vagas Disponíveis</span>
                 <ChevronRight className="w-4 h-4" />
@@ -210,44 +210,44 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           {/* Card Empresa / Contratante */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs hover:shadow-md transition-shadow space-y-6 flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs hover:shadow-md transition-all space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Building2 className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                   Para Empresas & Recrutadores
                 </span>
-                <h3 className="text-xl font-black text-slate-900 mt-1">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1">
                   Perfil Empresa / Contratante
                 </h3>
-                <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
                   Publique vagas com urgência garantida (24h/48h). Receba candidatos pré-ranqueados por índice de compatibilidade e convide para um <strong>Speed Chat de 15 minutos</strong>.
                 </p>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-slate-600 pt-2">
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 pt-2">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Publicação rápida com modelos pré-configurados</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Pipeline visual com convite de entrevista e propostas</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>Filtro de compatibilidade técnica em tempo real</span>
                 </li>
               </ul>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400 font-medium">Restrição: Não se candidata a vagas</span>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Restrição: Não se candidata a vagas</span>
               <button
                 onClick={() => onNavigate(session?.role === 'empresa' ? '/empresa' : '/cadastro')}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 hover:text-amber-800 cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 cursor-pointer"
               >
                 <span>{session?.role === 'empresa' ? 'Acessar Painel da Empresa' : 'Cadastrar Empresa'}</span>
                 <ChevronRight className="w-4 h-4" />
@@ -265,18 +265,18 @@ export const HomePage: React.FC<HomePageProps> = ({
               <span className="p-1 rounded-lg bg-amber-500 text-slate-950 font-black">
                 <Flame className="w-4 h-4 fill-current" />
               </span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 Vagas Flash com Resposta em 24 Horas
               </h2>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Posições ativas com compromisso de resposta rápida das equipes de contratação.
             </p>
           </div>
 
           <button
             onClick={() => onNavigate('/vagas')}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
           >
             <span>Ver Todas as {jobs.length} Vagas</span>
             <ArrowRight className="w-4 h-4" />
@@ -291,11 +291,11 @@ export const HomePage: React.FC<HomePageProps> = ({
                 onSelectJob(job);
                 onNavigate('/vagas');
               }}
-              className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xl shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl shrink-0">
                     {job.logo}
                   </div>
                   <span className="text-[10px] font-black uppercase bg-amber-500 text-slate-950 px-2 py-0.5 rounded">
@@ -303,27 +303,27 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </span>
                 </div>
 
-                <h4 className="font-bold text-slate-900 text-sm mt-3 hover:text-blue-600 transition-colors">
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm mt-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {job.title}
                 </h4>
-                <div className="text-xs text-slate-500 mt-1">
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {job.company} • {job.location} ({job.remoteType})
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-1">
                   {job.skills.slice(0, 3).map((s) => (
-                    <span key={s} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">
+                    <span key={s} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-medium">
                       {s}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-800">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-800 dark:text-slate-200">
                   {job.salaryPeriod === 'hr' ? `$${job.salaryMin}-$${job.salaryMax}/hr` : `$${Math.round(job.salaryMin/1000)}k-$${Math.round(job.salaryMax/1000)}k/ano`}
                 </span>
-                <span className="text-blue-600 font-bold flex items-center gap-1">
+                <span className="text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1">
                   Ver Detalhes <ChevronRight className="w-3.5 h-3.5" />
                 </span>
               </div>

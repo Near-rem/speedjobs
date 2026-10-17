@@ -101,16 +101,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
         {/* Back Link */}
         <button
           onClick={() => onNavigate('/')}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Voltar para a Página Inicial</span>
         </button>
 
         {/* Card Container */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-colors">
           {/* Header */}
-          <div className="p-6 bg-slate-900 text-white text-center space-y-2 border-b border-slate-800">
+          <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white text-center space-y-2 border-b border-slate-800">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 mx-auto flex items-center justify-center shadow-md">
               <Lock className="w-6 h-6 text-white" />
             </div>
@@ -121,14 +121,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
           </div>
 
           {/* Security Badges */}
-          <div className="px-5 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-            <span className="flex items-center gap-1 text-emerald-700">
+          <div className="px-5 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
               <ShieldCheck className="w-3.5 h-3.5" /> PBKDF2-SHA256
             </span>
-            <span className="flex items-center gap-1 text-blue-700">
+            <span className="flex items-center gap-1 text-blue-700 dark:text-blue-400">
               <KeyRound className="w-3.5 h-3.5" /> Anti-CSRF
             </span>
-            <span className="flex items-center gap-1 text-indigo-700">
+            <span className="flex items-center gap-1 text-indigo-700 dark:text-indigo-400">
               <Clock className="w-3.5 h-3.5" /> Anti-Brute Force
             </span>
           </div>
@@ -137,8 +137,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
           <div className="p-6 sm:p-8 space-y-5">
             {/* Lockout Warning */}
             {lockoutSeconds > 0 && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
-                <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+                <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="block font-bold">Bloqueio Temporário Ativado</strong>
                   {t('auth.rateLimitBlocked', { seconds: lockoutSeconds })}
@@ -148,55 +148,55 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
 
             {/* Error Message */}
             {errorMsg && lockoutSeconds === 0 && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   {t('auth.emailLabel')}
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('auth.emailPlaceholder')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="font-semibold text-slate-700">{t('auth.passwordLabel')}</label>
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">{t('auth.passwordLabel')}</label>
                   <button
                     type="button"
                     onClick={() => onNavigate('/recuperar-senha')}
-                    className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer"
                   >
                     {t('auth.forgotPasswordLink')}
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t('auth.passwordPlaceholder')}
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs"
+                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-850 text-slate-900 dark:text-white text-xs"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -204,7 +204,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-600">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={rememberMe}
@@ -231,41 +231,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) =
               </button>
 
               {/* Quick Demo Credentials */}
-              <div className="pt-4 border-t border-slate-100 space-y-2">
-                <span className="text-[11px] font-bold text-slate-400 block text-center uppercase tracking-wider">
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 block text-center uppercase tracking-wider">
                   Contas de Demonstração Rápidas
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={fillCandidateDemo}
-                    className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-left transition-colors cursor-pointer"
+                    className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-left transition-colors cursor-pointer"
                   >
                     <div className="font-bold flex items-center gap-1">
                       <UserCheck className="w-3.5 h-3.5" /> Funcionário
                     </div>
-                    <div className="text-[10px] text-blue-600 truncate">Alex Rivera (Candidato)</div>
+                    <div className="text-[10px] text-blue-600 dark:text-blue-400 truncate">Alex Rivera (Candidato)</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={fillEmployerDemo}
-                    className="p-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-left transition-colors cursor-pointer"
+                    className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-left transition-colors cursor-pointer"
                   >
                     <div className="font-bold flex items-center gap-1">
                       <Building2 className="w-3.5 h-3.5" /> Empresa
                     </div>
-                    <div className="text-[10px] text-amber-700 truncate">HyperScale Labs</div>
+                    <div className="text-[10px] text-amber-700 dark:text-amber-400 truncate">HyperScale Labs</div>
                   </button>
                 </div>
               </div>
 
-              <div className="pt-3 text-center text-slate-500 border-t border-slate-100">
+              <div className="pt-3 text-center text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
                 {t('auth.noAccount')}{' '}
                 <button
                   type="button"
                   onClick={() => onNavigate('/cadastro')}
-                  className="font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+                  className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer"
                 >
                   {t('auth.registerTitle')}
                 </button>

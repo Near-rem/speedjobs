@@ -191,4 +191,11 @@ export interface TranslationDictionary {
     cspStatus: string;
     encryptionStandard: string;
   };
+  theme: {
+    light: string;
+    dark: string;
+    system: string;
+    toggle: string;
+    mode: string;
+  };
 }

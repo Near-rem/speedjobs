@@ -191,4 +191,11 @@ export const enUS: TranslationDictionary = {
     cspStatus: 'Content Security Policy (CSP)',
     encryptionStandard: 'Cryptographic Standard',
   },
+  theme: {
+    light: 'Light Mode',
+    dark: 'Dark Mode',
+    system: 'System Preference',
+    toggle: 'Toggle Dark / Light Mode',
+    mode: 'Theme Mode',
+  },
 };
